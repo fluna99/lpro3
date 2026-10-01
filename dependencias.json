@@ -1,0 +1,16 @@
+{
+  "proyecto": "telemetria",
+  "descripcion": "Inventario declarado de dependencias de terceros. Es la entrada del generador de SBOM y la base del control de licencias. Cada componente debe tener version fija, licencia identificada y una persona responsable de vigilarlo.",
+  "dependencias": [
+    {
+      "nombre": "umbral",
+      "version": "1.2.0",
+      "licencia": "MIT",
+      "origen": "repositorio propio con espejo de continuidad",
+      "url": "https://github.com/EQUIPO/umbral.git",
+      "tipo": "biblioteca",
+      "ambito": "requerido",
+      "responsable": "usuario1@uma.es"
+    }
+  ]
+}

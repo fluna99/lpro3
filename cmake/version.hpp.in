@@ -1,0 +1,10 @@
+// Generado por CMake a partir de cmake/version.hpp.in -- NO EDITAR A MANO.
+#pragma once
+
+namespace telemetria {
+inline constexpr const char* kVersion      = "@PROJECT_VERSION@";
+inline constexpr const char* kVersionLarga = "@TELEMETRIA_VERSION_LARGA@";
+inline constexpr int kVersionMayor  = @PROJECT_VERSION_MAJOR@;
+inline constexpr int kVersionMenor  = @PROJECT_VERSION_MINOR@;
+inline constexpr int kVersionParche = @PROJECT_VERSION_PATCH@;
+}  // namespace telemetria

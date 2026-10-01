@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Enganche de cliente: impide registrar codigo mal formateado.
+#
+# Se ejecuta en la maquina del desarrollador, antes de crear el commit. Es la
+# barrera mas barata de todas: corrige el problema antes de que exista.
+set -euo pipefail
+
+command -v clang-format >/dev/null 2>&1 || exit 0
+
+ficheros=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cpp|hpp|h)$' || true)
+[ -n "$ficheros" ] || exit 0
+
+problemas=0
+for f in $ficheros; do
+    if ! clang-format --dry-run --Werror --style=file "$f" 2>/dev/null; then
+        echo "  formato incorrecto: $f"
+        problemas=$((problemas + 1))
+    fi
+done
+
+if [ "$problemas" -gt 0 ]; then
+    cat <<'AYUDA'
+
+Commit rechazado: hay ficheros que no cumplen el estilo del proyecto.
+Corrijalo con:
+    clang-format -i --style=file <ficheros>
+o bien:
+    cmake --build build/desarrollo --target formato
+AYUDA
+    exit 1
+fi

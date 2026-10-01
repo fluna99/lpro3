@@ -1,0 +1,113 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/instalado",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "desarrollo",
+      "displayName": "Desarrollo (Debug, avisos como errores)",
+      "description": "Configuracion del dia a dia en el puesto del desarrollador",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "TELEMETRIA_AVISOS_COMO_ERRORES": "ON",
+        "TELEMETRIA_CLANG_TIDY": "ON"
+      }
+    },
+    {
+      "name": "sanitizers",
+      "displayName": "Diagnostico (ASan + UBSan)",
+      "description": "Deteccion de errores de memoria y comportamiento indefinido",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    },
+    {
+      "name": "cobertura",
+      "displayName": "Cobertura de pruebas",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "TELEMETRIA_COBERTURA": "ON"
+      }
+    },
+    {
+      "name": "entrega",
+      "displayName": "Entrega (Release, optimizado)",
+      "description": "Configuracion con la que se generan los artefactos publicados",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "TELEMETRIA_AVISOS_COMO_ERRORES": "ON",
+        "BUILD_TESTING": "ON"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "desarrollo", "configurePreset": "desarrollo" },
+    { "name": "sanitizers", "configurePreset": "sanitizers" },
+    { "name": "cobertura",  "configurePreset": "cobertura"  },
+    { "name": "entrega",    "configurePreset": "entrega"    }
+  ],
+
+  "testPresets": [
+    {
+      "name": "desarrollo",
+      "configurePreset": "desarrollo",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error", "stopOnFailure": false }
+    },
+    {
+      "name": "sanitizers",
+      "configurePreset": "sanitizers",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "cobertura",
+      "configurePreset": "cobertura",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "entrega",
+      "configurePreset": "entrega",
+      "output": { "outputOnFailure": true, "outputJUnitFile": "informes/pruebas-junit.xml" },
+      "execution": { "noTestsAction": "error" }
+    }
+  ],
+
+  "packagePresets": [
+    {
+      "name": "entrega",
+      "configurePreset": "entrega",
+      "generators": [ "TGZ", "DEB" ],
+      "packageDirectory": "${sourceDir}/build/artefactos"
+    }
+  ],
+
+  "workflowPresets": [
+    {
+      "name": "entrega",
+      "displayName": "Flujo completo de entrega: configurar, compilar, probar y empaquetar",
+      "steps": [
+        { "type": "configure", "name": "entrega" },
+        { "type": "build",     "name": "entrega" },
+        { "type": "test",      "name": "entrega" },
+        { "type": "package",   "name": "entrega" }
+      ]
+    }
+  ]
+}
